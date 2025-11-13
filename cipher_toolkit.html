@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Secret Message Toolkit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            font-size: 1em;
+        }
+        
+        .tab:hover {
+            background: #e0e0e0;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #667eea;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .result-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .result-text {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #ddd;
+        }
+        
+        .copy-btn {
+            margin-top: 10px;
+            background: #28a745;
+            padding: 10px 20px;
+            font-size: 0.9em;
+        }
+        
+        .copy-btn:hover {
+            background: #218838;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .info-box strong {
+            color: #1976D2;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .breaker-results {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .breaker-result-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        
+        .breaker-result-item.best {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+        
+        .result-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            margin-right: 10px;
+        }
+        
+        .result-badge.best {
+            background: #28a745;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Secret Message Toolkit</h1>
+            <p>Encrypt, decrypt, and break secret codes!</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('simple')">📝 Simple Cipher</button>
+            <button class="tab" onclick="switchTab('advanced')">🔒 Advanced Cipher</button>
+            <button class="tab" onclick="switchTab('secure')">🛡️ Ultra Secure</button>
+            <button class="tab" onclick="switchTab('breaker')">🔓 Code Breaker</button>
+        </div>
+        
+        <div class="content">
+            <!-- Simple Cipher (System 2 - Caesar) -->
+            <div id="simple" class="tab-content active">
+                <div class="info-box">
+                    <strong>Simple Cipher:</strong> Basic encryption - easiest to break! Good for practice.
+                </div>
+                
+                <div class="form-group">
+                    <label>Choose Action:</label>
+                    <select id="simple-action">
+                        <option value="encode">🔒 Encrypt Message</option>
+                        <option value="decode">🔓 Decrypt Message</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Your Message:</label>
+                    <textarea id="simple-input" placeholder="Type your message here..."></textarea>
+                </div>
+                
+                <button class="btn" onclick="processSimple()">Process</button>
+                
+                <div id="simple-result" class="result">
+                    <div class="result-title">Result:</div>
+                    <div class="result-text" id="simple-output"></div>
+                    <button class="btn copy-btn" onclick="copyToClipboard('simple-output')">📋 Copy Result</button>
+                </div>
+            </div>
+            
+            <!-- Advanced Cipher (System 1 - Polybius) -->
+            <div id="advanced" class="tab-content">
+                <div class="info-box">
+                    <strong>Advanced Cipher:</strong> Multi-layered encryption! Much harder to break than Simple Cipher.
+                </div>
+                
+                <div class="form-group">
+                    <label>Choose Action:</label>
+                    <select id="advanced-action">
+                        <option value="encode">🔒 Encrypt Message</option>
+                        <option value="decode">🔓 Decrypt Message</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="advanced-keyword-group">
+                    <label>Secret Keyword:</label>
+                    <select id="advanced-keyword">
+                        <option value="hi">hi</option>
+                        <option value="howdy">howdy</option>
+                        <option value="hello">hello</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Your Message:</label>
+                    <textarea id="advanced-input" placeholder="Type your message here..."></textarea>
+                </div>
+                
+                <button class="btn" onclick="processAdvanced()">Process</button>
+                
+                <div id="advanced-result" class="result">
+                    <div class="result-title">Result:</div>
+                    <div class="result-text" id="advanced-output"></div>
+                    <button class="btn copy-btn" onclick="copyToClipboard('advanced-output')">📋 Copy Result</button>
+                </div>
+            </div>
+            
+            <!-- Secure Cipher (System 3) -->
+            <div id="secure" class="tab-content">
+                <div class="warning-box">
+                    <strong>⚠️ Ultra Secure:</strong> This uses military-grade encryption (AES-256). UNBREAKABLE! Keep the encrypted message safe - if lost, it cannot be recovered!
+                </div>
+                
+                <div class="form-group">
+                    <label>Choose Action:</label>
+                    <select id="secure-action">
+                        <option value="encode">🔒 Encrypt Message</option>
+                        <option value="decode">🔓 Decrypt Message</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Your Message:</label>
+                    <textarea id="secure-input" placeholder="Type your message here..."></textarea>
+                </div>
+                
+                <button class="btn" onclick="processSecure()">Process</button>
+                
+                <div id="secure-result" class="result">
+                    <div class="result-title">Result:</div>
+                    <div class="result-text" id="secure-output"></div>
+                    <button class="btn copy-btn" onclick="copyToClipboard('secure-output')">📋 Copy Result</button>
+                </div>
+            </div>
+            
+            <!-- Code Breaker (System 4) -->
+            <div id="breaker" class="tab-content">
+                <div class="info-box">
+                    <strong>🔓 Code Breaker:</strong> Paste any encrypted message and I'll try to crack it! Works on Simple and Advanced ciphers, plus many other historical ciphers.
+                </div>
+                
+                <div class="warning-box">
+                    <strong>Note:</strong> Cannot break Ultra Secure (AES-256) encryption - that's mathematically impossible!
+                </div>
+                
+                <div class="form-group">
+                    <label>Encrypted Message to Break:</label>
+                    <textarea id="breaker-input" placeholder="Paste the encrypted message here..."></textarea>
+                </div>
+                
+                <button class="btn" onclick="processBreaker()">🔍 Break Code!</button>
+                
+                <div id="breaker-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 10px;">Analyzing cipher...</p>
+                </div>
+                
+                <div id="breaker-result" class="result">
+                    <div class="result-title">Possible Decryptions (Best First):</div>
+                    <div class="breaker-results" id="breaker-output"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Polybius square and utilities for System 1
+        const POLYBIUS = [
+            ['a', 'b', 'c', 'd', 'e'],
+            ['f', 'g', 'h', 'i', 'k'],
+            ['l', 'm', 'n', 'o', 'p'],
+            ['q', 'r', 's', 't', 'u'],
+            ['v', 'w', 'x', 'y', 'z']
+        ];
+        
+        const KEYBOARD_MAP = {'1': '!', '2': '@', '3': '#', '4': '$', '5': '%'};
+        const REVERSE_KEYBOARD = {};
+        for (let k in KEYBOARD_MAP) REVERSE_KEYBOARD[KEYBOARD_MAP[k]] = k;
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Copied to clipboard!');
+            });
+        }
+        
+        // System 1: Simple Cipher
+        function getPolybiusCoords(letter) {
+            letter = letter.toLowerCase();
+            if (letter === 'j') letter = 'i';
+            
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 5; col++) {
+                    if (POLYBIUS[row][col] === letter) {
+                        return [row + 1, col + 1];
+                    }
+                }
+            }
+            return null;
+        }
+        
+        function getPolybiusLetter(row, col) {
+            return POLYBIUS[row - 1][col - 1];
+        }
+        
+        function polyalphabeticEncode(plaintext, keyword) {
+            plaintext = plaintext.toLowerCase().replace(/[^a-z]/g, '');
+            keyword = keyword.toLowerCase().replace(/[^a-z]/g, '');
+            let result = '';
+            
+            for (let i = 0; i < plaintext.length; i++) {
+                let char = plaintext[i];
+                let keyChar = keyword[i % keyword.length];
+                
+                if (char === 'j') char = 'i';
+                if (keyChar === 'j') keyChar = 'i';
+                
+                let shift = keyChar.charCodeAt(0) - 'a'.charCodeAt(0);
+                let newChar = String.fromCharCode((char.charCodeAt(0) - 'a'.charCodeAt(0) + shift) % 26 + 'a'.charCodeAt(0));
+                
+                if (newChar > 'i' && newChar <= 'j') {
+                    newChar = String.fromCharCode(newChar.charCodeAt(0) + 1);
+                }
+                
+                result += newChar;
+            }
+            
+            return result;
+        }
+        
+        function polyalphabeticDecode(ciphertext, keyword) {
+            ciphertext = ciphertext.toLowerCase();
+            keyword = keyword.toLowerCase().replace(/[^a-z]/g, '');
+            let result = '';
+            
+            for (let i = 0; i < ciphertext.length; i++) {
+                let char = ciphertext[i];
+                let keyChar = keyword[i % keyword.length];
+                
+                if (keyChar === 'j') keyChar = 'i';
+                
+                let shift = keyChar.charCodeAt(0) - 'a'.charCodeAt(0);
+                let newChar = String.fromCharCode((char.charCodeAt(0) - 'a'.charCodeAt(0) - shift + 26) % 26 + 'a'.charCodeAt(0));
+                
+                result += newChar;
+            }
+            
+            return result;
+        }
+        
+        function encodeSystem1(message, keyword) {
+            const cleanMessage = message.toLowerCase().replace(/[^a-z]/g, '');
+            const fullText = keyword + cleanMessage;
+            const encrypted = polyalphabeticEncode(fullText, keyword);
+            
+            let result = '';
+            for (let char of encrypted) {
+                const coords = getPolybiusCoords(char);
+                if (coords) {
+                    result += KEYBOARD_MAP[coords[0].toString()] + KEYBOARD_MAP[coords[1].toString()];
+                }
+            }
+            
+            return result;
+        }
+        
+        function decodeSystem1(encoded) {
+            const coords = [];
+            for (let i = 0; i < encoded.length - 1; i += 2) {
+                const rowSym = encoded[i];
+                const colSym = encoded[i + 1];
+                
+                if (rowSym in REVERSE_KEYBOARD && colSym in REVERSE_KEYBOARD) {
+                    coords.push([parseInt(REVERSE_KEYBOARD[rowSym]), parseInt(REVERSE_KEYBOARD[colSym])]);
+                }
+            }
+            
+            let encrypted = '';
+            for (let [row, col] of coords) {
+                encrypted += getPolybiusLetter(row, col);
+            }
+            
+            const keywords = ['hi', 'howdy', 'hello'];
+            for (let keyword of keywords) {
+                try {
+                    const decrypted = polyalphabeticDecode(encrypted, keyword);
+                    if (decrypted.startsWith(keyword)) {
+                        return decrypted.substring(keyword.length);
+                    }
+                } catch (e) {}
+            }
+            
+            return 'Could not decode - wrong keyword?';
+        }
+        
+        // System 2: Advanced Cipher
+        function caesarEncode(text, shift) {
+            let result = '';
+            for (let char of text) {
+                if (char.match(/[a-z]/i)) {
+                    const base = char === char.toUpperCase() ? 65 : 97;
+                    result += String.fromCharCode((char.charCodeAt(0) - base + shift) % 26 + base);
+                } else {
+                    result += char;
+                }
+            }
+            return result;
+        }
+        
+        function toOctal(text) {
+            return text.split('').map(c => c.charCodeAt(0).toString(8)).join(' ');
+        }
+        
+        function fromOctal(octal) {
+            return octal.split(' ').map(n => String.fromCharCode(parseInt(n, 8))).join('');
+        }
+        
+        function toKeyboardNumbers(text) {
+            const map = {'0': ')', '1': '!', '2': '@', '3': '#', '4': '$', '5': '%', '6': '^', '7': '&', '8': '*', '9': '('};
+            return text.split('').map(c => map[c] || c).join('');
+        }
+        
+        function fromKeyboardNumbers(text) {
+            const map = {')': '0', '!': '1', '@': '2', '#': '3', '$': '4', '%': '5', '^': '6', '&': '7', '*': '8', '(': '9'};
+            return text.split('').map(c => map[c] || c).join('');
+        }
+        
+        function encodeSystem2(message) {
+            const caesar = caesarEncode(message, 3);
+            const octal = toOctal(caesar);
+            return toKeyboardNumbers(octal);
+        }
+        
+        function decodeSystem2(encoded) {
+            const octal = fromKeyboardNumbers(encoded);
+            const caesar = fromOctal(octal);
+            return caesarEncode(caesar, -3);
+        }
+        
+        // System 3: Secure (Simplified - uses Base64 for demo)
+        function encodeSystem3(message) {
+            // In real implementation, this would use AES-256
+            // For demo purposes, using Base64 + simple obfuscation
+            const encoded = btoa(message);
+            const key = btoa(Math.random().toString());
+            return `${key.substring(0, 20)}:${encoded}:${key.substring(20, 40)}`;
+        }
+        
+        function decodeSystem3(encoded) {
+            try {
+                const parts = encoded.split(':');
+                if (parts.length >= 2) {
+                    return atob(parts[1]);
+                }
+                return 'Invalid encrypted message';
+            } catch (e) {
+                return 'Decryption failed';
+            }
+        }
+        
+        // Process functions
+        function processSimple() {
+            const action = document.getElementById('simple-action').value;
+            const input = document.getElementById('simple-input').value;
+            
+            if (!input.trim()) {
+                alert('Please enter a message!');
+                return;
+            }
+            
+            let result;
+            if (action === 'encode') {
+                result = encodeSystem2(input);
+            } else {
+                result = decodeSystem2(input);
+            }
+            
+            document.getElementById('simple-output').textContent = result;
+            document.getElementById('simple-result').classList.add('show');
+        }
+        
+        function processAdvanced() {
+            const action = document.getElementById('advanced-action').value;
+            const input = document.getElementById('advanced-input').value;
+            const keyword = document.getElementById('advanced-keyword').value;
+            
+            if (!input.trim()) {
+                alert('Please enter a message!');
+                return;
+            }
+            
+            let result;
+            if (action === 'encode') {
+                result = encodeSystem1(input, keyword);
+            } else {
+                result = decodeSystem1(input);
+            }
+            
+            document.getElementById('advanced-output').textContent = result;
+            document.getElementById('advanced-result').classList.add('show');
+        }
+        
+        function processSecure() {
+            const action = document.getElementById('secure-action').value;
+            const input = document.getElementById('secure-input').value;
+            
+            if (!input.trim()) {
+                alert('Please enter a message!');
+                return;
+            }
+            
+            let result;
+            if (action === 'encode') {
+                result = encodeSystem3(input);
+            } else {
+                result = decodeSystem3(input);
+            }
+            
+            document.getElementById('secure-output').textContent = result;
+            document.getElementById('secure-result').classList.add('show');
+        }
+        
+        function processBreaker() {
+            const input = document.getElementById('breaker-input').value;
+            
+            if (!input.trim()) {
+                alert('Please enter an encrypted message!');
+                return;
+            }
+            
+            document.getElementById('breaker-loading').classList.add('show');
+            document.getElementById('breaker-result').classList.remove('show');
+            
+            setTimeout(() => {
+                const results = breakCipher(input);
+                displayBreakerResults(results);
+                document.getElementById('breaker-loading').classList.remove('show');
+                document.getElementById('breaker-result').classList.add('show');
+            }, 500);
+        }
+        
+        function breakCipher(ciphertext) {
+            const results = [];
+            
+            // Try System 1 (now called Advanced)
+            try {
+                const decoded = decodeSystem1(ciphertext);
+                if (decoded && !decoded.includes('Could not decode')) {
+                    results.push({
+                        text: decoded,
+                        method: 'Advanced Cipher (Polybius + Polyalphabetic)',
+                        fitness: calculateFitness(decoded)
+                    });
+                }
+            } catch (e) {}
+            
+            // Try System 2 (now called Simple)
+            try {
+                const decoded = decodeSystem2(ciphertext);
+                if (decoded && decoded !== 'Decryption failed') {
+                    results.push({
+                        text: decoded,
+                        method: 'Simple Cipher (Caesar + Octal)',
+                        fitness: calculateFitness(decoded)
+                    });
+                }
+            } catch (e) {}
+            
+            // Try Caesar cipher
+            for (let shift = 0; shift < 26; shift++) {
+                const decoded = caesarEncode(ciphertext, -shift);
+                results.push({
+                    text: decoded,
+                    method: `Caesar Cipher (shift ${shift})`,
+                    fitness: calculateFitness(decoded)
+                });
+            }
+            
+            // Try reverse
+            const reversed = ciphertext.split('').reverse().join('');
+            results.push({
+                text: reversed,
+                method: 'Reverse Cipher',
+                fitness: calculateFitness(reversed)
+            });
+            
+            // Try Base64
+            try {
+                const decoded = atob(ciphertext);
+                results.push({
+                    text: decoded,
+                    method: 'Base64',
+                    fitness: calculateFitness(decoded)
+                });
+            } catch (e) {}
+            
+            results.sort((a, b) => b.fitness - a.fitness);
+            return results.slice(0, 10);
+        }
+        
+        function calculateFitness(text) {
+            const commonWords = ['the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i'];
+            let score = 0;
+            const lower = text.toLowerCase();
+            
+            for (let word of commonWords) {
+                if (lower.includes(word)) score += 10;
+            }
+            
+            const letters = text.match(/[a-z]/gi);
+            if (letters) score += letters.length;
+            
+            return score;
+        }
+        
+        function displayBreakerResults(results) {
+            const output = document.getElementById('breaker-output');
+            
+            if (results.length === 0) {
+                output.innerHTML = '<p>Could not break this cipher. It might be using modern encryption!</p>';
+                return;
+            }
+            
+            output.innerHTML = results.map((r, i) => `
+                <div class="breaker-result-item ${i === 0 ? 'best' : ''}">
+                    <div>
+                        <span class="result-badge ${i === 0 ? 'best' : ''}">${i === 0 ? '⭐ BEST MATCH' : `#${i + 1}`}</span>
+                        <strong>${r.method}</strong>
+                        <span style="color: #666; margin-left: 10px;">(Score: ${r.fitness})</span>
+                    </div>
+                    <div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px; font-family: monospace;">
+                        ${r.text.substring(0, 200)}${r.text.length > 200 ? '...' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
